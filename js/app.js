@@ -8,6 +8,8 @@ let arregloCarrito = [];
 
 // Funciones de click
 listaCursos.addEventListener('click', agregarCarroBtn)
+vaciarCarrito.addEventListener('click', borrarTodo)
+espacioCarrito.addEventListener('click', borrarCurso)
 
 
 function agregarCarroBtn(e) {
@@ -28,8 +30,33 @@ function agregarCarroBtn(e) {
         }
 
         // console.log(infoCursos)
+
+        // Que no se repita un curso si ya está siendo puesto
+        const existe = arregloCarrito.some((curso) => {
+            return curso.id === infoCursos.id
+        })
+
+        if(existe) {
+            // Acà actuara si la cantidad es mayor a uno
+            const cursos = arregloCarrito.map((curso) => {
+                if(curso.id === infoCursos.id) {
+                    curso.cantidad++
+                    return curso
+                } else {
+                    return curso
+                }
+
+            })
+
+            arregloCarrito = [...cursos]
+
+        } else {
+            // Si el curso no se repite actuara normalmente
+            arregloCarrito = [...arregloCarrito, infoCursos]
+        }
         
-        arregloCarrito = [...arregloCarrito, infoCursos]
+        
+        
         console.log(arregloCarrito)
 
         mostrarHTML();
@@ -59,7 +86,7 @@ function mostrarHTML() {
                 ${curso.cantidad}
             </td>
             <td>
-                <a href="#" class="borrar-curso">X</a>
+                <a href="#" class="borrar-curso" data-id="${curso.id}">X</a>
             </td>
         `;
 
@@ -71,4 +98,27 @@ function mostrarHTML() {
 
 function limpiarHTML() {
     tbody.innerHTML= ''
+}
+
+// Funcion para borrar todos los cursos disponibles
+function borrarTodo() {
+    arregloCarrito = []; // El arreglo se pone vacio
+    console.log(arregloCarrito)
+
+    limpiarHTML(); // y se llama a la función de limpiar html para que todo se exprese en el html
+}
+
+function borrarCurso(e) {
+    // console.log(e.target)
+    if(e.target.classList.contains('borrar-curso')) {
+        // Para eliminar un curso usaremos la propiedad de .filter
+
+        const cursoId = e.target.getAttribute('data-id')
+
+        arregloCarrito = arregloCarrito.filter((curso) => {
+            return curso.id !== cursoId
+        })
+    }
+
+    mostrarHTML();
 }
