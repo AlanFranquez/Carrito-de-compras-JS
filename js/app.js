@@ -3,105 +3,64 @@ const tbody = document.querySelector('tbody');
 const vaciarCarrito = document.querySelector('#vaciar-carrito');
 const listaCursos = document.querySelector('#lista-cursos');
 const carrito = document.querySelector('#carrito')
+const card = document.querySelector('.agregar-carrito');
 
 let arregloCarrito = []
 
-// Eventos
-listaCursos.addEventListener('click', agregarCursos);
-vaciarCarrito.addEventListener('click', borrarTodo)
-carrito.addEventListener('click', borrarUnCurso)
+document.addEventListener('DOMContentLoaded', () => {
+    listaCursos.addEventListener('click', buscarCurso);
+
+    vaciarCarrito.addEventListener('click', borrarCursos)
+})
 
 
-// funciones
-function agregarCursos(e) {
+
+function buscarCurso(e) {
     e.preventDefault();
-    // console.log(e.target)
 
     if(e.target.classList.contains('agregar-carrito')) {
-        const card = e.target.parentElement.parentElement;
-        // console.log(card)
-
-        informacionCursos = {
-            titulo: card.querySelector('h4').textContent,
-            imagen: card.querySelector('img').src,
-            precio: card.querySelector('.precio span').textContent,
-            id: card.querySelector('a').getAttribute('data-id'),
-            cantidad: 1
-        }
-
-        const existe = arregloCarrito.some((curso) =>{
-            return curso.id === informacionCursos.id
-        })
-
-        if(existe) {
-            const cursos = arregloCarrito.map((curso) => {
-                if(curso.id === informacionCursos.id) {
-                    curso.cantidad++
-                    return curso
-                } else {
-                    return curso
-                }
-            })
-        } else {
-            arregloCarrito = [...arregloCarrito, informacionCursos]
-        }
-
-
-
-        mostrarHTML();
+        leerCurso(e)
     }
 }
 
-function mostrarHTML() {
+function leerCurso(e) {
+    // console.log(e.target.parentElement.parentElement)
 
-    // Se limpia el html para que no se repitan los cursos en cada arreglo
-    limpiarHTML()
+    const curso = e.target.parentElement.parentElement;
+
+    const OBJCurso = {
+        // añadirle el tipo de dato que queremos
+        img: curso.querySelector('img').src,
+        nombre: curso.querySelector('h4').textContent,
+        precio: curso.querySelector('.precio span').textContent,
+        id: curso.querySelector('a').getAttribute('data-id'),
+        cantidad: 1
+    }
+
+    arregloCarrito = [...arregloCarrito, OBJCurso];
+
+    console.log(arregloCarrito)
+
+    agregarHTML();
+}
+
+
+function agregarHTML() {
+
+    limpiarHTML();
 
     arregloCarrito.forEach((curso) => {
-        const fila = document.createElement('tr');
+        const tr = document.createElement('tr');
 
-        fila.innerHTML= `
-            <td>
-                <img src="${curso.imagen}" width=120>
-            </td>
-
-            <td>
-                ${curso.titulo}
-            </td>
-
-            <td>
-                ${curso.precio}
-            </td>
-
-            <td>
-                ${curso.cantidad}
-            </td>
-
-            <td>
-            <a href="#" data-id="${curso.id}" class="borrar-curso">X</a>
-            </td>
+        tr.innerHTML = `
+            <td><img src="${curso.img}" width=100></td>
+            <td>${curso.nombre}</td>
+            <td>${curso.precio}</td>
+            <td>${curso.cantidad}</td>
         `;
 
-        tbody.appendChild(fila)
+        tbody.appendChild(tr)
     })
-
-}
-
-// Se usa esta forma para eliminar un curso en particular
-function borrarUnCurso(e) {
-
-    // evitamos el evnet bubbling seleccionando el boton de la clase
-    if(e.target.classList.contains('borrar-curso')) {
-        // Accedemos a su id
-        const cursoId = e.target.getAttribute('data-id')
-
-        // y usamos .filter
-        arregloCarrito = arregloCarrito.filter((curso) => {
-            return curso.id !== cursoId
-        })
-
-        mostrarHTML()
-    }
 }
 
 
@@ -109,8 +68,23 @@ function limpiarHTML() {
     tbody.innerHTML = ''
 }
 
-function borrarTodo() {
-    arregloCarrito = [];
+function borrarCursos() {
+    tbody.innerHTML = ''
 
-    limpiarHTML();
+    const p = document.createElement('p')
+    p.textContent = 'El carrito ha sido vaciado'
+    p.classList.add('cartelVaciarCarrito', 'norepeat')
+
+
+    const norepeat = document.querySelectorAll('.norepeat');
+    if(norepeat.length === 0) {
+        vaciarCarrito.appendChild(p)
+    }
+
+
+    setTimeout(() => {
+        p.remove()
+    }, 2000);
+    
+
 }
